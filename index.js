@@ -12,11 +12,67 @@ const heroSectionEl = document.querySelector(".hero-section");
 const heroSectionRowEl = document.querySelector(".hero-section > .row");
 
 /**
+ * to get the heros on initial load
+ */
+async function getHeros() {
+  // hiding hero section
+  herosSectionEl.classList.remove("hide");
+  if (!heroSectionEl.classList.contains("hide")) {
+    heroSectionEl.classList.add("hide");
+  }
+  // removing all the spaces and replacing ASCII values to use in the url
+  // searchName = searchInputEl.value.trim().replaceAll(" ", "%20");
+  // https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=a&apikey=
+  const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}`;
+  // const url = `https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=${searchName}&apikey=${API_KEY}&hash=${HASH}`;
+  try {
+    const options = {
+      headers: {
+        accept: "application/json",
+      },
+    };
+    const response = await fetch(url, options);
+    const data = await response.json();
+    const results = data.data.results;
+
+    herosSectionRowEl.innerHTML = "";
+    results &&
+      results.forEach((hero) => {
+        const heroContainer = document.createElement("div");
+        heroContainer.className = "col";
+        heroContainer.innerHTML = `
+      <div class="card text-bg-dark">
+      <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" class="card-img" alt="${hero.title}" />
+      <div
+      class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
+      >
+      <h5 class="card-title">${hero.name}</h5>
+      <p class="card-text text-truncate text-wrap">${hero.description}</p>
+      <div class="d-flex justify-content-end">
+      <button
+      class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 like-btn"
+      >
+      <i class="fa-regular fa-heart"></i>
+      </button>
+      </div>
+      </div>
+      </div>
+      `;
+        // append
+        herosSectionRowEl.appendChild(heroContainer);
+      });
+  } catch (err) {
+    console.log(err);
+  }
+}
+/**
  * to get the hero details on search
  */
 async function getHero() {
   // hiding heros section
-  herosSectionEl.classList.add("hide");
+  if (!herosSectionEl.classList.contains("hide")) {
+    herosSectionEl.classList.add("hide");
+  }
   heroSectionEl.classList.remove("hide");
   // removing all the spaces and replacing ASCII values to use in the url
   searchName = searchInputEl.value.trim().replaceAll(" ", "%20");
@@ -68,3 +124,8 @@ formEl.addEventListener("submit", (event) => {
  * event listener to get the hero on search
  */
 searchBtnEl.addEventListener("click", getHero);
+
+/**
+ * initial load
+ */
+getHeros();
