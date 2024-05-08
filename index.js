@@ -2,8 +2,18 @@ const TS = "1715173816644";
 const HASH = "a3fe35699f6a43a267cb3ebb2d25b485";
 const API_KEY = "48caf58f8fb4a70a2be3cf30df6ab460";
 let searchName = "a";
-let favouriteHerosList = [];
+let favouriteHerosList =
+  JSON.parse(localStorage.getItem("favouriteHeros")) || [];
 
+const homeBtn = document.querySelector(".home");
+const favouriteBtn = document.querySelector(".favourite");
+const homeSectionEl = document.querySelector(".home-section");
+const favouritesSectionEl = document.querySelector(
+  ".favourite-heros-container"
+);
+const favouritesSectionRowEl = document.querySelector(
+  ".favourite-heros-container > .row"
+);
 const searchInputEl = document.querySelector(".search-input");
 const searchBtnEl = document.querySelector(".search-btn");
 const formEl = document.querySelector("form");
@@ -13,19 +23,27 @@ const heroSectionEl = document.querySelector(".hero-section");
 const heroSectionRowEl = document.querySelector(".hero-section > .row");
 
 /**
- * to add the movies to favourites
- * @param {id of the movie selected} movieId
+ * to add the heros to favourites
+ * @param {liked hero data} hero
  */
 function addToFavourite(hero) {
-  // const movieData = moviesList.find((movie) => movie.id === hero);
   const heroExists =
     favouriteHerosList &&
     favouriteHerosList.find((item) => item.id === hero.id);
   if (!heroExists) {
     favouriteHerosList.push(hero);
-    // localStorage.setItem("favourites", JSON.stringify(favouriteMovies));
+    localStorage.setItem("favouriteHeros", JSON.stringify(favouriteHerosList));
   }
-  console.log({ favouriteHerosList });
+}
+
+/**
+ * to add the heros to favourites
+ * @param {dis-liked hero data} hero
+ */
+function removeFromFavourite(hero) {
+  favouriteHerosList = favouriteHerosList.filter((item) => item.id !== hero.id);
+  localStorage.setItem("favouriteHeros", JSON.stringify(favouriteHerosList));
+  renderFavouriteHeros();
 }
 
 /**
@@ -55,7 +73,9 @@ async function getHeros() {
         heroContainer.className = "col";
         heroContainer.innerHTML = `
       <div class="card text-bg-dark">
-      <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" class="card-img" alt="${hero.title}" />
+      <img src="${hero.thumbnail.path}.${
+          hero.thumbnail.extension
+        }" class="card-img" alt="${hero.title}" />
       <div
       class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
       >
@@ -65,7 +85,11 @@ async function getHeros() {
       <button
       class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 like-btn"
       >
-      <i class="fa-regular fa-heart"></i>
+      ${
+        favouriteHerosList.find((item) => item.id === hero.id)
+          ? '<i class="fa-solid fa-heart text-danger"></i>'
+          : '<i class="fa-regular fa-heart"></i>'
+      }
       </button>
       </div>
       </div>
@@ -88,6 +112,7 @@ async function getHeros() {
     console.log(err);
   }
 }
+
 /**
  * to get the hero details on search
  */
@@ -114,7 +139,9 @@ async function getHero() {
     heroContainer.className = "col";
     heroContainer.innerHTML = `
       <div class="card text-bg-dark">
-      <img src="${heroData.thumbnail.path}.${heroData.thumbnail.extension}" class="card-img" alt="${heroData.name}" />
+      <img src="${heroData.thumbnail.path}.${
+      heroData.thumbnail.extension
+    }" class="card-img" alt="${heroData.name}" />
       <div
       class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
       >
@@ -123,7 +150,12 @@ async function getHero() {
       <div class="d-flex justify-content-end">
       <button
       class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 like-btn"
-      ><i class="fa-regular fa-heart"></i>
+      >
+      ${
+        favouriteHerosList.find((item) => item.id === hero.id)
+          ? '<i class="fa-solid fa-heart text-danger"></i>'
+          : '<i class="fa-regular fa-heart"></i>'
+      }
       </button>
       </div>
       </div>
@@ -145,6 +177,45 @@ async function getHero() {
   }
 }
 
+function renderFavouriteHeros() {
+  favouritesSectionRowEl.innerHTML = "";
+  favouriteHerosList &&
+    favouriteHerosList.forEach((hero) => {
+      const heroContainer = document.createElement("div");
+      heroContainer.className = "col";
+      heroContainer.innerHTML = `
+      <div class="card text-bg-dark">
+      <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" class="card-img" alt="${hero.title}" />
+      <div
+      class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
+      >
+      <h5 class="card-title">${hero.name}</h5>
+      <p class="card-text text-truncate text-wrap">${hero.description}</p>
+      <div class="d-flex justify-content-end">
+      <button
+      class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 dislike-btn"
+      >
+      <i class="fa-solid fa-heart-crack"></i>
+      </button>
+      </div>
+      </div>
+      </div>
+      `;
+
+      // event listener to like button
+      const likeBtn = heroContainer.querySelector(".dislike-btn");
+      likeBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        // likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        // likeBtn.classList.add("text-danger");
+        removeFromFavourite(hero);
+      });
+
+      // appending to parent
+      favouritesSectionRowEl.appendChild(heroContainer);
+    });
+}
+
 /**
  * to prevent unwanted submission of the form
  */
@@ -156,6 +227,31 @@ formEl.addEventListener("submit", (event) => {
  * event listener to get the hero on search
  */
 searchBtnEl.addEventListener("click", getHero);
+
+/**
+ * to render home view
+ */
+homeBtn.addEventListener("click", () => {
+  homeBtn.classList.add("active");
+  favouriteBtn.classList.remove("active");
+  if (!favouritesSectionEl.classList.contains("hide")) {
+    favouritesSectionEl.classList.add("hide");
+  }
+  homeSectionEl.classList.remove("hide");
+});
+
+/**
+ * to render favourite heros view
+ */
+favouriteBtn.addEventListener("click", () => {
+  homeBtn.classList.remove("active");
+  favouriteBtn.classList.add("active");
+  if (!homeSectionEl.classList.contains("hide")) {
+    homeSectionEl.classList.add("hide");
+  }
+  favouritesSectionEl.classList.remove("hide");
+  renderFavouriteHeros();
+});
 
 /**
  * initial load
