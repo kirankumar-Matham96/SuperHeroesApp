@@ -2,6 +2,7 @@ const TS = "1715173816644";
 const HASH = "a3fe35699f6a43a267cb3ebb2d25b485";
 const API_KEY = "48caf58f8fb4a70a2be3cf30df6ab460";
 let searchName = "a";
+let favouriteHerosList = [];
 
 const searchInputEl = document.querySelector(".search-input");
 const searchBtnEl = document.querySelector(".search-btn");
@@ -12,6 +13,22 @@ const heroSectionEl = document.querySelector(".hero-section");
 const heroSectionRowEl = document.querySelector(".hero-section > .row");
 
 /**
+ * to add the movies to favourites
+ * @param {id of the movie selected} movieId
+ */
+function addToFavourite(hero) {
+  // const movieData = moviesList.find((movie) => movie.id === hero);
+  const heroExists =
+    favouriteHerosList &&
+    favouriteHerosList.find((item) => item.id === hero.id);
+  if (!heroExists) {
+    favouriteHerosList.push(hero);
+    // localStorage.setItem("favourites", JSON.stringify(favouriteMovies));
+  }
+  console.log({ favouriteHerosList });
+}
+
+/**
  * to get the heros on initial load
  */
 async function getHeros() {
@@ -20,11 +37,7 @@ async function getHeros() {
   if (!heroSectionEl.classList.contains("hide")) {
     heroSectionEl.classList.add("hide");
   }
-  // removing all the spaces and replacing ASCII values to use in the url
-  // searchName = searchInputEl.value.trim().replaceAll(" ", "%20");
-  // https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=a&apikey=
   const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}`;
-  // const url = `https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=${searchName}&apikey=${API_KEY}&hash=${HASH}`;
   try {
     const options = {
       headers: {
@@ -58,7 +71,17 @@ async function getHeros() {
       </div>
       </div>
       `;
-        // append
+
+        // event listener to like button
+        const likeBtn = heroContainer.querySelector("button");
+        likeBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+          likeBtn.classList.add("text-danger");
+          addToFavourite(hero);
+        });
+
+        // appending to parent
         herosSectionRowEl.appendChild(heroContainer);
       });
   } catch (err) {
@@ -85,18 +108,18 @@ async function getHero() {
     };
     const response = await fetch(url, options);
     const data = await response.json();
-    console.log("path: ", data.data.results[0]);
+    const heroData = data.data.results[0];
     heroSectionRowEl.innerHTML = "";
     const heroContainer = document.createElement("div");
     heroContainer.className = "col";
     heroContainer.innerHTML = `
       <div class="card text-bg-dark">
-      <img src="${data.data.results[0].thumbnail.path}.${data.data.results[0].thumbnail.extension}" class="card-img" alt="${data.data.results[0].name}" />
+      <img src="${heroData.thumbnail.path}.${heroData.thumbnail.extension}" class="card-img" alt="${heroData.name}" />
       <div
       class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
       >
-      <h5 class="card-title">${data.data.results[0].name}</h5>
-      <p class="card-text text-wrap">${data.data.results[0].description}</p>
+      <h5 class="card-title">${heroData.name}</h5>
+      <p class="card-text text-wrap">${heroData.description}</p>
       <div class="d-flex justify-content-end">
       <button
       class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 like-btn"
@@ -106,6 +129,15 @@ async function getHero() {
       </div>
       </div>
       `;
+
+    // event listener to like button
+    const likeBtn = heroContainer.querySelector("button");
+    likeBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+      likeBtn.classList.add("text-danger");
+      addToFavourite(heroData);
+    });
 
     heroSectionRowEl.appendChild(heroContainer);
   } catch (err) {
