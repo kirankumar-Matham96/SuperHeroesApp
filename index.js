@@ -18,6 +18,7 @@ const searchInputEl = document.querySelector(".search-input");
 const searchBtnEl = document.querySelector(".search-btn");
 const clearBtnEl = document.querySelector(".clear-btn");
 const formEl = document.querySelector("form");
+const suggestionsContainerEl = document.querySelector(".suggestions-container");
 const herosSectionEl = document.querySelector(".heroes-section");
 const herosSectionRowEl = document.querySelector(".heroes-section > .row");
 const heroSectionEl = document.querySelector(".hero-section");
@@ -38,7 +39,7 @@ function addToFavourite(hero) {
 }
 
 /**
- * to add the heros to favourites
+ * to remove the heros from favourites
  * @param {dis-liked hero data} hero
  */
 function removeFromFavourite(hero) {
@@ -57,6 +58,38 @@ function getRandomChar() {
   return { offset, char };
 }
 
+async function renderSuggestions() {
+  const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}&limit=3`;
+  try {
+    const options = {
+      headers: {
+        accept: "application/json",
+      },
+    };
+    const response = await fetch(url, options);
+    const data = await response.json();
+    const results = data.data.results;
+    suggestionsContainerEl.innerHTML = "";
+    results &&
+      results.forEach((hero) => {
+        const suggestionEl = document.createElement("div");
+        suggestionEl.className = "pb-1 bg-dark search-suggestion";
+        suggestionEl.innerHTML = `<span class="text-light">${hero.name}</span>`;
+
+        suggestionEl.addEventListener("click", () => {
+          //clearing the suggestions
+          suggestionsContainerEl.innerHTML = "";
+          // getting the hero
+          getHero();
+        });
+
+        // appending to parent
+        suggestionsContainerEl.appendChild(suggestionEl);
+      });
+  } catch (err) {
+    console.log(err);
+  }
+}
 /**
  * to get the heros on initial load
  */
@@ -301,11 +334,22 @@ homeBtn &&
     if (searchInputEl.value !== "") {
       // showing the clear button
       clearBtnEl.classList.remove("hide");
+      suggestionsContainerEl.remove("hide");
+      // updating the search term
+      searchName = searchInputEl.value;
+    } else {
+      // clearing the suggestions
+      suggestionsContainerEl.innerHTML = "";
+      suggestionsContainerEl.add("hide");
     }
+    renderSuggestions();
   });
 
 homeBtn &&
   clearBtnEl.addEventListener("click", () => {
+    // clearing the suggestions
+    suggestionsContainerEl.remove("hide");
+    suggestionsContainerEl.innerHTML = "";
     // clearing the search box
     searchInputEl.value = "";
     // hiding the clear button
@@ -319,6 +363,10 @@ homeBtn &&
 homeBtn &&
   searchBtnEl.addEventListener("click", () => {
     const inputValue = searchInputEl.value.trim();
+    // clearing the suggestions
+    suggestionsContainerEl.remove("hide");
+    suggestionsContainerEl.innerHTML = "";
+    // getting the data
     inputValue !== "" ? getHero() : getHeros();
   });
 

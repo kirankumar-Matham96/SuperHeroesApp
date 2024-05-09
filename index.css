@@ -35,6 +35,9 @@ nav {
 .active {
   color: var(--biscuit) !important;
 }
+form {
+  height: 10px !important;
+}
 .search-input:focus {
   color: var(--light);
   box-shadow: none;
@@ -44,6 +47,16 @@ nav {
   color: var(--bright-yellow);
   padding: 0 20px;
   font-size: 1.5rem;
+}
+.search-suggestion {
+  padding: 10px 10px 10px 10px;
+}
+.search-suggestion:hover {
+  cursor: pointer;
+  transform: translate(0px, -5px);
+}
+.search-suggestion:hover > span {
+  color: var(--biscuit) !important;
 }
 .bg-container {
   min-height: 100vh;
@@ -59,6 +72,8 @@ nav {
 }
 .main-bg-container {
   background-image: linear-gradient(var(--overlay), var(--overlay));
+  margin: 0;
+  width: 100%;
   min-height: 100vh;
   position: relative;
 }
@@ -72,7 +87,7 @@ nav {
   margin: 5rem 0 4rem;
 }
 .input-container {
-  margin: 0 0 5rem;
+  margin: 0;
   box-shadow: 0 0 8px -2px var(--light);
 }
 .search-btn {
