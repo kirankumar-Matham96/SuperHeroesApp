@@ -58,6 +58,9 @@ function getRandomChar() {
   return { offset, char };
 }
 
+/**
+ * to show the search suggestions as user types in the search box
+ */
 async function renderSuggestions() {
   const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}&limit=3`;
   try {
@@ -90,6 +93,7 @@ async function renderSuggestions() {
     console.log(err);
   }
 }
+
 /**
  * to get the heros on initial load
  */
@@ -242,29 +246,33 @@ async function getHero() {
   }
 }
 
+/**
+ * to get the hero details on clicking the hero card
+ * @param {id of the selected hero} characterId
+ * @returns
+ */
 async function getHeroDetails(characterId) {
-  console.log("characterId: ", characterId);
-  // GET /v1/public/characters/{characterId}/comics
   const comicsUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/comics?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
   const eventsUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/events?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
   const seriesUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/series?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
   const storiesUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/stories?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
 
+  // fetching the comics related to the hero
   const comicsResponse = await fetch(comicsUrl);
   const comicsData = await comicsResponse.json();
-  // console.log("comics data of the hero:", comicsData.data.results);
 
+  // fetching the events related to the hero
   const eventsResponse = await fetch(eventsUrl);
   const eventsData = await eventsResponse.json();
-  // console.log("events data of the hero:", eventsData.data.results);
 
+  // fetching the series related to the hero
   const seriesResponse = await fetch(seriesUrl);
   const seriesData = await seriesResponse.json();
-  // console.log("series data of the hero:", seriesData.data.results);
 
+  // fetching the stories related to the hero
   const storiesResponse = await fetch(storiesUrl);
   const storiesData = await storiesResponse.json();
-  // console.log("stories data of the hero:", storiesData.data.results);
+
   const [comics, events, series, stories] = [
     comicsData.data.results,
     eventsData.data.results,
@@ -274,6 +282,9 @@ async function getHeroDetails(characterId) {
   return { comics, events, series, stories };
 }
 
+/**
+ * to render the favourite heros
+ */
 function renderFavouriteHeros() {
   favouritesSectionRowEl.innerHTML = "";
   favouriteHerosList &&
@@ -320,6 +331,13 @@ function renderFavouriteHeros() {
     });
 }
 
+/* 
+  NOTE:
+  - This script is connected to both index.html and heroPage.html pages.
+  - Hence, to prevent errors, using the homeBtn element to distinguish the current page.
+  - When the "homeBtn" exists, then it is the home page. Else, it is the details page.
+*/
+
 /**
  * to prevent unwanted submission of the form
  */
@@ -328,6 +346,9 @@ homeBtn &&
     event.preventDefault();
   });
 
+/**
+ * event listener to detect the change in the input
+ */
 homeBtn &&
   searchInputEl.addEventListener("input", () => {
     // clearing the search box
@@ -345,6 +366,9 @@ homeBtn &&
     renderSuggestions();
   });
 
+/**
+ * event listener to clear the input
+ */
 homeBtn &&
   clearBtnEl.addEventListener("click", () => {
     // clearing the suggestions
@@ -357,6 +381,7 @@ homeBtn &&
     // rendering the default trending movies
     getHeros();
   });
+
 /**
  * event listener to get the hero on search
  */
