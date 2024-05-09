@@ -73,8 +73,6 @@ nav {
 }
 .input-container {
   margin: 0 0 5rem;
-}
-.search-input {
   box-shadow: 0 0 8px -2px var(--light);
 }
 .search-btn {

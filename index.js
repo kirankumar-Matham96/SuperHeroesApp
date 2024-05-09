@@ -16,6 +16,7 @@ const favouritesSectionRowEl = document.querySelector(
 );
 const searchInputEl = document.querySelector(".search-input");
 const searchBtnEl = document.querySelector(".search-btn");
+const clearBtnEl = document.querySelector(".clear-btn");
 const formEl = document.querySelector("form");
 const herosSectionEl = document.querySelector(".heroes-section");
 const herosSectionRowEl = document.querySelector(".heroes-section > .row");
@@ -294,6 +295,24 @@ homeBtn &&
     event.preventDefault();
   });
 
+homeBtn &&
+  searchInputEl.addEventListener("input", () => {
+    // clearing the search box
+    if (searchInputEl.value !== "") {
+      // showing the clear button
+      clearBtnEl.classList.remove("hide");
+    }
+  });
+
+homeBtn &&
+  clearBtnEl.addEventListener("click", () => {
+    // clearing the search box
+    searchInputEl.value = "";
+    // hiding the clear button
+    clearBtnEl.classList.add("hide");
+    // rendering the default trending movies
+    getHeros();
+  });
 /**
  * event listener to get the hero on search
  */
