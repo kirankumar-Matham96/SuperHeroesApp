@@ -44,41 +44,43 @@
           const { comics, events, series, stories } = await getHeroDetails(
             heroData.id
           );
-          console.log({ comics, events, series, stories });
+          // hiding the loader
+          const loaderEl = document.querySelector(".loader");
+          loaderEl.classList.add("hide");
           const overViewEl = document.querySelector(".hero-overview");
           const data = `<div class="mb-2 comics-container">
-            <h5>Comics:</h5>
-          ${
-            comics &&
-            comics.map((comic, index) => {
-              return ` <span>${index + 1}. ${comic.title}</span>`;
-            })
-          }
+            <h4>Comics:</h4>
+            ${
+              comics &&
+              comics.map((comic, index) => {
+                return ` <span>${index + 1}. ${comic.title}</span>`;
+              })
+            }
         </div>
         <div class="mb-2 events-container">
-          <h5>Events:</h5>
+          <h4>Events:</h4>
           ${
             events &&
-            events.map((event) => {
-              return `<span>${event.title}</span>`;
+            events.map((event, index) => {
+              return ` <span>${index + 1}. ${event.title}</span>`;
             })
           }
         </div>
         <div class="mb-2 series-container">
-          <h5>Series:</h5>
+          <h4>Series:</h4>
           ${
             series &&
-            series.map((series) => {
-              return `<span>${series.title}</span>`;
+            series.map((series, index) => {
+              return ` <span>${index + 1}. ${series.title}</span>`;
             })
           }
         </div>
         <div class="mb-2 stories-container">
-          <h5>Stories:</h5>
+          <h4>Stories:</h4>
           ${
             stories &&
-            stories.map((story) => {
-              return `<span>${story.title}</span>`;
+            stories.map((story, index) => {
+              return ` <span>${index + 1}. ${story.title}</span>`;
             })
           }
         </div>`;
@@ -93,7 +95,6 @@
         heroData.thumbnail.path.replace("http", "https") +
         "." +
         heroData.thumbnail.extension;
-      console.log(imgUrl);
       const heroDetailsContainerEl = document.querySelector(
         ".hero-details-container"
       );
@@ -107,8 +108,18 @@
           />
         </div>
         <div class="text-light w-50 ps-4 pe-4 rounded-5 hero-details">
-          <h2 class="hero-title">${heroData.name}</h2>
-          <p class="mt-4 hero-overview">${heroData.description}</p>
+          <h2 class="text-start hero-title">${heroData.name}</h2>
+          <p class="mt-4 hero-overview">${
+            heroData.description || "Description not available!"
+          }</p>
+          <div class="loader">
+            <button class="btn btn-light rounded-5 d-flex justify-content-center align-items-center" type="button" disabled>
+              <div class="spinner-grow text-dark me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <span>Loading...</span>
+            </button>
+          </div>
         </div>
       </div>`;
       renderHeroDetails();

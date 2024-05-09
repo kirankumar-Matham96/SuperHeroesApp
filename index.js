@@ -51,7 +51,9 @@ function removeFromFavourite(hero) {
  * @returns random number between 97 and 122 (to get random chars from a to z)
  */
 function getRandomChar() {
-  return Math.floor(Math.random() * (122 - 97 + 1) + 97);
+  const offset = Math.floor(Math.random() * (20 - 1 + 1) + 1);
+  const char = Math.floor(Math.random() * (122 - 97 + 1) + 97);
+  return { offset, char };
 }
 
 /**
@@ -59,14 +61,14 @@ function getRandomChar() {
  */
 async function getHeros() {
   // on every load or search, random heros will load
-  const char = String.fromCharCode(getRandomChar());
-  searchName = char;
+  const { offset, char } = getRandomChar();
+  searchName = String.fromCharCode(char);
   // hiding hero section
   herosSectionEl.classList.remove("hide");
   if (!heroSectionEl.classList.contains("hide")) {
     heroSectionEl.classList.add("hide");
   }
-  const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}`;
+  const url = `https://gateway.marvel.com:443/v1/public/characters?ts=${TS}&apikey=${API_KEY}&hash=${HASH}&nameStartsWith=${searchName}&offset=${offset}`;
   try {
     const options = {
       headers: {
@@ -190,6 +192,13 @@ async function getHero() {
         likeBtn.classList.add("text-danger");
         addToFavourite(heroData);
       });
+
+      heroContainer.addEventListener("click", () => {
+        // setting the hero data in the local storage
+        localStorage.setItem("heroData", JSON.stringify(heroData));
+        // to open the Hero Details page in the new tab
+        window.open("heroPage.html?_blank");
+      });
     } else {
       heroContainer.innerHTML = `<h2 class="text-light">Hero not found!</h2>`;
     }
@@ -263,6 +272,13 @@ function renderFavouriteHeros() {
         // likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
         // likeBtn.classList.add("text-danger");
         removeFromFavourite(hero);
+      });
+
+      heroContainer.addEventListener("click", () => {
+        // setting the hero data in the local storage
+        localStorage.setItem("heroData", JSON.stringify(hero));
+        // to open the Hero Details page in the new tab
+        window.open("heroPage.html?_blank");
       });
 
       // appending to parent

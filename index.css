@@ -9,6 +9,7 @@
   --bright-yellow: #e4d804;
   --overlay: rgba(0, 0, 0, 0.5);
   --no-color: transparent;
+  --biscuit: #ece0bf;
 }
 body {
   font-family: "Roboto", sans-serif;
@@ -32,7 +33,7 @@ nav {
   width: 150px;
 }
 .active {
-  color: var(--bright-yellow) !important;
+  color: var(--biscuit) !important;
 }
 .search-input:focus {
   color: var(--light);
@@ -48,7 +49,6 @@ nav {
   min-height: 100vh;
   width: 100vw;
   position: relative;
-  background-image: linear-gradient(var(--overlay), var(--overlay));
 }
 .bg-image {
   position: fixed;
@@ -58,6 +58,8 @@ nav {
   height: 100%;
 }
 .main-bg-container {
+  background-image: linear-gradient(var(--overlay), var(--overlay));
+  min-height: 100vh;
   position: relative;
 }
 .header-section {
