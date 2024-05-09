@@ -116,6 +116,13 @@ async function getHeros() {
           addToFavourite(hero);
         });
 
+        heroContainer.addEventListener("click", () => {
+          // setting the hero data in the local storage
+          localStorage.setItem("heroData", JSON.stringify(hero));
+          // to open the Hero Details page in the new tab
+          window.open("heroPage.html?_blank");
+        });
+
         // appending to parent
         herosSectionRowEl.appendChild(heroContainer);
       });
@@ -192,6 +199,38 @@ async function getHero() {
   }
 }
 
+async function getHeroDetails(characterId) {
+  console.log("characterId: ", characterId);
+  // GET /v1/public/characters/{characterId}/comics
+  const comicsUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/comics?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
+  const eventsUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/events?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
+  const seriesUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/series?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
+  const storiesUrl = `https://gateway.marvel.com:443/v1/public/characters/${characterId}/stories?ts=${TS}&apikey=${API_KEY}&hash=${HASH}`;
+
+  const comicsResponse = await fetch(comicsUrl);
+  const comicsData = await comicsResponse.json();
+  // console.log("comics data of the hero:", comicsData.data.results);
+
+  const eventsResponse = await fetch(eventsUrl);
+  const eventsData = await eventsResponse.json();
+  // console.log("events data of the hero:", eventsData.data.results);
+
+  const seriesResponse = await fetch(seriesUrl);
+  const seriesData = await seriesResponse.json();
+  // console.log("series data of the hero:", seriesData.data.results);
+
+  const storiesResponse = await fetch(storiesUrl);
+  const storiesData = await storiesResponse.json();
+  // console.log("stories data of the hero:", storiesData.data.results);
+  const [comics, events, series, stories] = [
+    comicsData.data.results,
+    eventsData.data.results,
+    seriesData.data.results,
+    storiesData.data.results,
+  ];
+  return { comics, events, series, stories };
+}
+
 function renderFavouriteHeros() {
   favouritesSectionRowEl.innerHTML = "";
   favouriteHerosList &&
@@ -234,44 +273,48 @@ function renderFavouriteHeros() {
 /**
  * to prevent unwanted submission of the form
  */
-formEl.addEventListener("submit", (event) => {
-  event.preventDefault();
-});
+homeBtn &&
+  formEl.addEventListener("submit", (event) => {
+    event.preventDefault();
+  });
 
 /**
  * event listener to get the hero on search
  */
-searchBtnEl.addEventListener("click", () => {
-  const inputValue = searchInputEl.value.trim();
-  inputValue !== "" ? getHero() : getHeros();
-});
+homeBtn &&
+  searchBtnEl.addEventListener("click", () => {
+    const inputValue = searchInputEl.value.trim();
+    inputValue !== "" ? getHero() : getHeros();
+  });
 
 /**
  * to render home view
  */
-homeBtn.addEventListener("click", () => {
-  homeBtn.classList.add("active");
-  favouriteBtn.classList.remove("active");
-  if (!favouritesSectionEl.classList.contains("hide")) {
-    favouritesSectionEl.classList.add("hide");
-  }
-  homeSectionEl.classList.remove("hide");
-});
+homeBtn &&
+  homeBtn.addEventListener("click", () => {
+    homeBtn.classList.add("active");
+    favouriteBtn.classList.remove("active");
+    if (!favouritesSectionEl.classList.contains("hide")) {
+      favouritesSectionEl.classList.add("hide");
+    }
+    homeSectionEl.classList.remove("hide");
+  });
 
 /**
  * to render favourite heros view
  */
-favouriteBtn.addEventListener("click", () => {
-  homeBtn.classList.remove("active");
-  favouriteBtn.classList.add("active");
-  if (!homeSectionEl.classList.contains("hide")) {
-    homeSectionEl.classList.add("hide");
-  }
-  favouritesSectionEl.classList.remove("hide");
-  renderFavouriteHeros();
-});
+homeBtn &&
+  favouriteBtn.addEventListener("click", () => {
+    homeBtn.classList.remove("active");
+    favouriteBtn.classList.add("active");
+    if (!homeSectionEl.classList.contains("hide")) {
+      homeSectionEl.classList.add("hide");
+    }
+    favouritesSectionEl.classList.remove("hide");
+    renderFavouriteHeros();
+  });
 
 /**
  * initial load
  */
-getHeros();
+homeBtn && getHeros();

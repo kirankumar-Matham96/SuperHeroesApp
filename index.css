@@ -57,6 +57,9 @@ nav {
   width: 100vw;
   height: 100%;
 }
+.main-bg-container {
+  position: relative;
+}
 .header-section {
   padding: 3rem 0 1rem;
 }
@@ -110,12 +113,21 @@ nav {
 /* hero details page */
 .hero-details-container {
   background-image: linear-gradient(var(--overlay), var(--overlay));
-  padding: 2rem 10rem;
+  padding: 5rem 10rem;
 }
 .poster-container {
   width: 50%;
 }
+.poster-container > img {
+  width: 100%;
+  transform: skewY(5deg);
+  box-shadow: -10px -10px 10px 10px white;
+}
 .hero-details {
+  transform: skewY(-5deg);
+  rotate: y -26deg;
+  box-shadow: 10px -10px 10px 10px white;
+  background-image: linear-gradient(var(--gray-dark), var(--gray-dark));
   padding-right: 5rem;
   text-align: justify;
 }
