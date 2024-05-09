@@ -47,9 +47,20 @@ function removeFromFavourite(hero) {
 }
 
 /**
+ *
+ * @returns random number between 97 and 122 (to get random chars from a to z)
+ */
+function getRandomChar() {
+  return Math.floor(Math.random() * (122 - 97 + 1) + 97);
+}
+
+/**
  * to get the heros on initial load
  */
 async function getHeros() {
+  // on every load or search, random heros will load
+  const char = String.fromCharCode(getRandomChar());
+  searchName = char;
   // hiding hero section
   herosSectionEl.classList.remove("hide");
   if (!heroSectionEl.classList.contains("hide")) {
@@ -133,44 +144,48 @@ async function getHero() {
     };
     const response = await fetch(url, options);
     const data = await response.json();
-    const heroData = data.data.results[0];
+    const heroData = data.data.results && data.data.results[0];
+    console.log({ heroData });
     heroSectionRowEl.innerHTML = "";
     const heroContainer = document.createElement("div");
     heroContainer.className = "col";
-    heroContainer.innerHTML = `
-      <div class="card text-bg-dark">
-      <img src="${heroData.thumbnail.path}.${
-      heroData.thumbnail.extension
-    }" class="card-img" alt="${heroData.name}" />
-      <div
-      class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
-      >
-      <h5 class="card-title">${heroData.name}</h5>
-      <p class="card-text text-wrap">${heroData.description}</p>
-      <div class="d-flex justify-content-end">
-      <button
-      class="btn btn-light d-flex justify-content-center align-items-center rounded-pill w-25 like-btn"
-      >
-      ${
-        favouriteHerosList.find((item) => item.id === hero.id)
-          ? '<i class="fa-solid fa-heart text-danger"></i>'
-          : '<i class="fa-regular fa-heart"></i>'
-      }
-      </button>
-      </div>
-      </div>
-      </div>
-      `;
+    if (heroData) {
+      heroContainer.innerHTML = `
+        <div class="card text-bg-dark">
+        <img src="${heroData.thumbnail.path}.${
+        heroData.thumbnail.extension
+      }" class="card-img" alt="${heroData.name}" />
+        <div
+        class="d-flex flex-column justify-content-end align-item-center text-center card-img-overlay hero-card-overlay"
+        >
+        <h5 class="card-title">${heroData.name}</h5>
+        <p class="card-text text-wrap">${heroData.description}</p>
+        <div class="d-flex justify-content-end">
+        <button
+        class="btn btn-light d-flex justify-content-center align-items-center rounded-pill like-btn"
+        >
+        ${
+          favouriteHerosList.find((item) => item.id === heroData.id)
+            ? '<i class="fa-solid fa-heart text-danger"></i>'
+            : '<i class="fa-regular fa-heart"></i>'
+        }
+        </button>
+        </div>
+        </div>
+        </div>
+        `;
 
-    // event listener to like button
-    const likeBtn = heroContainer.querySelector("button");
-    likeBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
-      likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-      likeBtn.classList.add("text-danger");
-      addToFavourite(heroData);
-    });
-
+      // event listener to like button
+      const likeBtn = heroContainer.querySelector("button");
+      likeBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        likeBtn.classList.add("text-danger");
+        addToFavourite(heroData);
+      });
+    } else {
+      heroContainer.innerHTML = `<h2 class="text-light">Hero not found!</h2>`;
+    }
     heroSectionRowEl.appendChild(heroContainer);
   } catch (err) {
     console.log(err);
@@ -226,7 +241,10 @@ formEl.addEventListener("submit", (event) => {
 /**
  * event listener to get the hero on search
  */
-searchBtnEl.addEventListener("click", getHero);
+searchBtnEl.addEventListener("click", () => {
+  const inputValue = searchInputEl.value.trim();
+  inputValue !== "" ? getHero() : getHeros();
+});
 
 /**
  * to render home view
