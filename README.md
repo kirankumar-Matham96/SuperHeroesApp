@@ -2,6 +2,10 @@
 
 A simple search application to find Marvel's super heros.
 
+## Live demo
+
+https://kirankumar-matham96.github.io/SuperHeroesApp/
+
 ## Installation
 
 Clone or download this repository.
