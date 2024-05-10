@@ -310,12 +310,10 @@ function renderFavouriteHeros() {
       </div>
       `;
 
-      // event listener to like button
-      const likeBtn = heroContainer.querySelector(".dislike-btn");
-      likeBtn.addEventListener("click", (event) => {
+      // event listener to dislike button
+      const dislikeBtn = heroContainer.querySelector(".dislike-btn");
+      dislikeBtn.addEventListener("click", (event) => {
         event.stopPropagation();
-        // likeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-        // likeBtn.classList.add("text-danger");
         removeFromFavourite(hero);
       });
 
