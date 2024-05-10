@@ -79,6 +79,7 @@ form {
 }
 .header-section {
   padding: 3rem 0 1rem;
+  margin-bottom: 6rem;
 }
 .main-h {
   color: var(--light);
